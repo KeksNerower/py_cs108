@@ -1,5 +1,26 @@
 import typing as tp
 
+#MY FUNCTION
+def shift_counter(ch: str, shift: int) -> str:
+    res = ch
+    if 'A' < ch < 'Z':
+        min_ch = 'A'
+        max_ch = 'Z'
+    elif 'a' < ch < 'z':
+        min_ch = 'a'
+        max_ch = 'z'
+    else: 
+        return res
+
+    if (ord(ch) + shift <= ord(max_ch)):
+        res = chr(ord(ch) + shift)
+    else:
+        dist = ord(max_ch) - ord(ch)
+        new_shift = shift - dist
+        res = chr(ord(min_ch) + new_shift)
+
+    return res
+    
 
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     """
@@ -16,6 +37,14 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     """
     ciphertext = ""
     # PUT YOUR CODE HERE
+    if shift > (ord('z') - ord('a')):
+        return plaintext
+    
+
+    for ch in plaintext:
+        ciphertext += shift_counter(ch, shift)
+        
+    #END OF CODE
     return ciphertext
 
 
