@@ -1,7 +1,7 @@
 import typing as tp
 
 #MY FUNCTION
-def encrypt_counter(ch: str, shift: int) -> str:
+def shift_counter(ch: str, shift: int) -> str:
     res = ch
 
     if 'a' <= ch <= 'z':
@@ -12,47 +12,27 @@ def encrypt_counter(ch: str, shift: int) -> str:
         to_ch = 'Z'
     else: 
         return res
+    
+    reverser = 1
+    r_shift_flag = shift < 0#true => reverse shift
 
-    if ord(ch) + shift <= ord(to_ch):
+    if r_shift_flag:
+        from_ch, to_ch = to_ch, from_ch
+        reverser = -1
+
+
+    up_moving_flag = ord(ch) + shift <= ord(to_ch) and not r_shift_flag#true => ch-position after shift <= then to_ch-position & normal shift
+    down_moving_flag = ord(ch) + shift >= ord(to_ch) and r_shift_flag#true => ch-position after shift >= to_ch-position & reverse shift
+
+    if up_moving_flag or down_moving_flag:
         res = chr(ord(ch) + shift)
     else:
         dist = ord(to_ch) - ord(ch)
-        new_shift = shift - dist -1
+        new_shift = shift - dist -1*reverser
         res = chr(ord(from_ch) + new_shift)
 
     return res
-def decrypt_counter(ch: str, shift: int) -> str:
-    res = ch
 
-    if 'a' <= ch <= 'z':
-        from_ch = 'z'
-        to_ch = 'a'
-    elif 'A' <= ch <= 'Z':
-        from_ch = 'Z'
-        to_ch = 'A'
-    else: 
-        return res
-
-    if ord(ch) - shift >= ord(to_ch):
-        res = chr(ord(ch) - shift)
-    else:
-        dist = ord(ch) - ord(to_ch)
-        new_shift = shift - dist -1
-        res = chr(ord(from_ch) - new_shift)
-
-    return res
-
-
-'''
-    if (ord(ch) - shift >= ord(to_ch)):
-        res = chr(ord(ch) - shift)
-    else:
-        dist = ord(to_ch) - ord(ch)
-        new_shift = shift - dist
-        res = chr(ord(from_ch) + new_shift +1)
-
-    return res
-'''
 
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     """
@@ -73,7 +53,7 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
         return plaintext
 
     for ch in plaintext:
-        ciphertext += encrypt_counter(ch, shift)
+        ciphertext += shift_counter(ch, shift)
         
     #END OF CODE
     return ciphertext
@@ -98,7 +78,7 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
         return ciphertext
 
     for ch in ciphertext:
-        plaintext += decrypt_counter(ch, shift)
+        plaintext += shift_counter(ch, -shift)
     #END CODE
     return plaintext
 
