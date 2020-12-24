@@ -1,7 +1,7 @@
 from caesar import shift_counter
 
 
-def shift_parser(shift_in_chars: str) -> [int]:
+def shift_parser(shift_in_chars: str) -> tp.List[int]:
     shift_in_ints = []
     shift_in_chars = shift_in_chars.lower()
 
