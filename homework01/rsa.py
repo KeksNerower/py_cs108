@@ -1,5 +1,5 @@
-import math
 import random
+import math
 import typing as tp
 
 
@@ -15,10 +15,16 @@ def is_prime(n: int) -> bool:
     False
     """
     # PUT YOUR CODE HERE
-    for i in range(math.ceil(math.sqrt(n))):
-        if i % n == 0:
-            return False
+    if n == 2:
         return True
+
+    if n > 1:
+        for i in range(2, math.ceil(math.sqrt(n)) +1):
+            if (n % i) == 0:
+                return False
+        return True
+    else:
+        return False
     # END OF CODE
 
 
@@ -51,7 +57,16 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     23
     """
     # PUT YOUR CODE HERE
-    pass
+    e = e % phi
+    if e == 0:
+        return e
+    
+    for x in range(1, phi):
+        if e*x % phi == 1:
+            return x
+    return 1
+
+    # END OF CODE
 
 
 def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[int, int]]:
