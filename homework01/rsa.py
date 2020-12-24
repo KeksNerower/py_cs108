@@ -1,3 +1,4 @@
+import math
 import random
 import typing as tp
 
@@ -14,7 +15,11 @@ def is_prime(n: int) -> bool:
     False
     """
     # PUT YOUR CODE HERE
-    pass
+    for i in range(math.ceil(math.sqrt(n))):
+        if i % n == 0:
+            return False
+        return True
+    # END OF CODE
 
 
 def gcd(a: int, b: int) -> int:
@@ -27,7 +32,14 @@ def gcd(a: int, b: int) -> int:
     1
     """
     # PUT YOUR CODE HERE
-    pass
+    while a != 0 and b != 0:
+        if a > b:
+            a = a % b
+        else:
+            b = b % a
+    
+    return a + b
+    # END OF CODE
 
 
 def multiplicative_inverse(e: int, phi: int) -> int:
@@ -50,9 +62,11 @@ def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[in
 
     # n = pq
     # PUT YOUR CODE HERE
+    n = p * q
 
     # phi = (p-1)(q-1)
     # PUT YOUR CODE HERE
+    phi = (p -1) * (q -1)
 
     # Choose an integer e such that e and phi(n) are coprime
     e = random.randrange(1, phi)
