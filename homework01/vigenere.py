@@ -1,5 +1,6 @@
-from caesar import shift_counter
 import typing as tp
+
+from caesar import shift_counter
 
 
 def shift_parser(shift_in_chars: str) -> tp.List[int]:
