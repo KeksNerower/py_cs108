@@ -13,7 +13,6 @@ def shift_parser(shift_in_chars: str) -> tp.List[int]:
     return shift_in_ints
 
 
-
 def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     """
     Encrypts plaintext using a Vigenere cipher.
@@ -28,7 +27,7 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     ciphertext = ""
     # PUT YOUR CODE HERE
     converted_keyword = shift_parser(keyword)
-    
+
     for i in range(len(plaintext)):
         ciphertext += shift_counter(plaintext[i], converted_keyword[i % len(converted_keyword)])
 
@@ -53,6 +52,6 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
 
     for i in range(len(ciphertext)):
         plaintext += shift_counter(ciphertext[i], -converted_keyword[i % len(converted_keyword)])
-    
+
     return plaintext
     # END OF CODE
