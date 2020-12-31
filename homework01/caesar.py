@@ -37,7 +37,6 @@ def shift_counter(ch: str, shift: int) -> str:
 
     return res
 
-
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     """
     Encrypts plaintext using a Caesar cipher.
@@ -59,7 +58,6 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     for ch in plaintext:
         ciphertext += shift_counter(ch, shift)
 
-    # END OF CODE
     return ciphertext
 
 
@@ -83,7 +81,7 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
 
     for ch in ciphertext:
         plaintext += shift_counter(ch, -shift)
-    # END CODE
+        
     return plaintext
 
 
