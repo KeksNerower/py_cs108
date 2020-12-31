@@ -1,7 +1,7 @@
 import typing as tp
 
 
-#THIS IS JUST FOR NEW REQUEST
+
 # MY FUNCTION
 def shift_counter(ch: str, shift: int) -> str:
     res = ch
