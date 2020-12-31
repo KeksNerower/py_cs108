@@ -37,6 +37,7 @@ def shift_counter(ch: str, shift: int) -> str:
 
     return res
     # END OF CODE
+    
 
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     """
