@@ -1,7 +1,6 @@
 import typing as tp
 
 
-# MY FUNCTION
 def shift_counter(ch: str, shift: int) -> str:
     res = ch
 
@@ -36,7 +35,6 @@ def shift_counter(ch: str, shift: int) -> str:
         res = chr(ord(from_ch) + new_shift)
 
     return res
-    # END OF CODE
 
 
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
@@ -53,7 +51,6 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ''
     """
     ciphertext = ""
-    # PUT YOUR CODE HERE
     if shift > (ord("z") - ord("a")):
         return plaintext
 
@@ -61,7 +58,6 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
         ciphertext += shift_counter(ch, shift)
 
     return ciphertext
-    # END OF CODE
 
 
 def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
@@ -78,7 +74,6 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     ''
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
     if shift > (ord("z") - ord("a")):
         return ciphertext
 
@@ -86,7 +81,6 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
         plaintext += shift_counter(ch, -shift)
 
     return plaintext
-    # END OF CODE
 
 
 def caesar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:

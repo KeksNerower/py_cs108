@@ -25,13 +25,11 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     'LXFOPVEFRNHR'
     """
     ciphertext = ""
-    # PUT YOUR CODE HERE
     converted_keyword = shift_parser(keyword)
 
     for i in range(len(plaintext)):
         ciphertext += shift_counter(plaintext[i], converted_keyword[i % len(converted_keyword)])
 
-    # END OF CODE
     return ciphertext
 
 
@@ -47,11 +45,9 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     'ATTACKATDAWN'
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
     converted_keyword = shift_parser(keyword)
 
     for i in range(len(ciphertext)):
         plaintext += shift_counter(ciphertext[i], -converted_keyword[i % len(converted_keyword)])
 
     return plaintext
-    # END OF CODE
