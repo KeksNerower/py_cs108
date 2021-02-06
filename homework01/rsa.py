@@ -56,10 +56,18 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     if e == 0:
         return e
 
-    for x in range(1, phi):
-        if e * x % phi == 1:
-            return x
-    return 1
+    x, y, a = egcd(e, phi)
+    return x % phi
+
+
+def egcd(a: int, b: int):
+    x, xx, y, yy = 1, 0, 0, 1
+    while b:
+        q = a // b
+        a, b = b, a % b
+        x, xx = xx, x - xx * q
+        y, yy = yy, y - yy * q
+    return (x, y, a)
 
 
 def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[int, int]]:
