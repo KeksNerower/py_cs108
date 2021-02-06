@@ -51,8 +51,7 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ''
     """
     ciphertext = ""
-    if shift > (ord("z") - ord("a")):
-        return plaintext
+    shift = shift % (ord("z") - ord("a"))
 
     for ch in plaintext:
         ciphertext += shift_counter(ch, shift)
@@ -74,8 +73,7 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     ''
     """
     plaintext = ""
-    if shift > (ord("z") - ord("a")):
-        return ciphertext
+    shift = shift % (ord("z") - ord("a"))
 
     for ch in ciphertext:
         plaintext += shift_counter(ch, -shift)
