@@ -160,10 +160,17 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
 
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
-    """ Если решение solution верно, то вернуть True, в противном случае False """
-    # TODO: Add doctests with bad puzzles
-    pass
-
+    """ Если решение solution верно, то вернуть True, в противном случае False 
+    
+    >>> check_solution([['1','2','3'], ['4','5','6'], ['7','8','9']])
+    True
+    >>> check_solution([['1','2','2'], ['4','5','6'], ['7','8','9']])
+    False
+    >>> check_solution([['1','2','3'], ['4','5','6'], ['7','8','1']])
+    False
+    """
+    
+    
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     """Генерация судоку заполненного на N элементов
