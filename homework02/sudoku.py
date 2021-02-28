@@ -169,8 +169,18 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     >>> check_solution([['1','2','3'], ['4','5','6'], ['7','8','1']])
     False
     """
-    
-    
+    for i in range(len(solution)):
+        point = (i, i)
+        b_point = ((i // 3)*3, i % 3)
+
+        full = (set(get_row(solution, point)) &
+                set(get_col(solution, point)) &
+                set(get_block(solution, b_point)))
+        
+        if (set("123456789") != full):
+            return False
+        
+        return True
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     """Генерация судоку заполненного на N элементов
@@ -206,3 +216,5 @@ if __name__ == "__main__":
             print(f"Puzzle {fname} can't be solved")
         else:
             display(solution)
+            if check_solution(solution):
+                print("OK\n")
