@@ -1,5 +1,7 @@
 import pathlib
 import typing as tp
+import random
+import time
 
 T = tp.TypeVar("T")
 
@@ -171,7 +173,7 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     """
     for i in range(len(solution)):
         point = (i, i)
-        b_point = ((i // 3)*3, i % 3)
+        b_point = ((i // 3)*3, (i % 3)*3)
 
         full = (set(get_row(solution, point)) &
                 set(get_col(solution, point)) &
@@ -180,7 +182,7 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
         if (set("123456789") != full):
             return False
         
-        return True
+    return True
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     """Генерация судоку заполненного на N элементов
@@ -204,7 +206,25 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     >>> check_solution(solution)
     True
     """
-    pass
+    random.seed(time.process_time())
+
+    size = 9 #grid size; IT SHOULD BE THE SQUARE OF INTEGER (9, 16, 25, ..)
+    n = int(size ** (1/2)) #base of grid
+
+    #base grid
+    grid = [['.' for j in range(size)] for i in range(size)]
+    solve(grid)
+
+    # amount of cells that should be removed
+    amount = size*size - N
+    while amount > 0:
+        row, col = [random.randrange(9) for i in range(2)]
+        
+        if (grid[row][col] != '.'):
+            grid[row][col] = '.'
+            amount -= 1
+
+    return grid
 
 
 if __name__ == "__main__":
@@ -214,7 +234,7 @@ if __name__ == "__main__":
         solution = solve(grid)
         if not solution:
             print(f"Puzzle {fname} can't be solved")
-        else:
+        else: 
             display(solution)
             if check_solution(solution):
                 print("OK\n")
