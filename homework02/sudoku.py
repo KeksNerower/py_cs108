@@ -32,7 +32,6 @@ def display(grid: tp.List[tp.List[str]]) -> None:
         )
         if str(row) in "25":
             print(line)
-    print()
 
 
 def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
@@ -113,6 +112,7 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     for i in range(len(grid)):
         if "." in grid[i]:
             return (i, grid[i].index("."))
+    return None
 
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
