@@ -44,7 +44,7 @@ def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
     >>> group([1,2,3,4,5,6,7,8,9], 3)
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     """
-    return [values[i:i+n] for i in range(0, len(values), n)]
+    return [values[i : i + n] for i in range(0, len(values), n)]
 
 
 def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -89,13 +89,13 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
     size = 3
 
     row, col = pos
-    v = (row // size)*size
-    h = (col // size)*size
+    v = (row // size) * size
+    h = (col // size) * size
 
     res = []
     for i in range(0, size):
         for j in range(0, size):
-            res.append(grid[v+i][h+j])
+            res.append(grid[v + i][h + j])
     return res
 
 
@@ -111,8 +111,8 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     """
     pos = ()
     for i in range(len(grid)):
-        if ('.' in grid[i]):
-            return(i, grid[i].index('.'))
+        if "." in grid[i]:
+            return (i, grid[i].index("."))
 
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
@@ -126,11 +126,11 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     >>> values == {'2', '5', '9'}
     True
     """
-    used_values = set(get_row(grid, pos)).union(
-                    set(get_col(grid, pos))).union(
-                    set(get_block(grid, pos)))
+    used_values = (
+        set(get_row(grid, pos)).union(set(get_col(grid, pos))).union(set(get_block(grid, pos)))
+    )
 
-    return set('123456789').difference(used_values)
+    return set("123456789").difference(used_values)
 
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
@@ -147,23 +147,23 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     [['5', '3', '4', '6', '7', '8', '9', '1', '2'], ['6', '7', '2', '1', '9', '5', '3', '4', '8'], ['1', '9', '8', '3', '4', '2', '5', '6', '7'], ['8', '5', '9', '7', '6', '1', '4', '2', '3'], ['4', '2', '6', '8', '5', '3', '7', '9', '1'], ['7', '1', '3', '9', '2', '4', '8', '5', '6'], ['9', '6', '1', '5', '3', '7', '2', '8', '4'], ['2', '8', '7', '4', '1', '9', '6', '3', '5'], ['3', '4', '5', '2', '8', '6', '1', '7', '9']]
     """
     pos = find_empty_positions(grid)
-    if (not pos):
+    if not pos:
         return grid
     row, col = pos
-    
+
     for i in find_possible_values(grid, pos):
         grid[row][col] = i
 
         if solve(grid):
             return grid
 
-    grid[row][col] = '.'
+    grid[row][col] = "."
     return None
 
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
-    """ Если решение solution верно, то вернуть True, в противном случае False 
-    
+    """Если решение solution верно, то вернуть True, в противном случае False
+
     >>> check_solution([['1','2','3'], ['4','5','6'], ['7','8','9']])
     True
     >>> check_solution([['1','2','2'], ['4','5','6'], ['7','8','9']])
@@ -173,16 +173,19 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     """
     for i in range(len(solution)):
         point = (i, i)
-        b_point = ((i // 3)*3, (i % 3)*3)
+        b_point = ((i // 3) * 3, (i % 3) * 3)
 
-        full = (set(get_row(solution, point)) &
-                set(get_col(solution, point)) &
-                set(get_block(solution, b_point)))
-        
-        if (set("123456789") != full):
+        full = (
+            set(get_row(solution, point))
+            & set(get_col(solution, point))
+            & set(get_block(solution, b_point))
+        )
+
+        if set("123456789") != full:
             return False
-        
+
     return True
+
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     """Генерация судоку заполненного на N элементов
@@ -208,20 +211,20 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     """
     random.seed(time.process_time())
 
-    size = 9 #grid size; IT SHOULD BE THE SQUARE OF INTEGER (9, 16, 25, ..)
-    n = int(size ** (1/2)) #base of grid
+    size = 9  # grid size; IT SHOULD BE THE SQUARE OF INTEGER (9, 16, 25, ..)
+    n = int(size ** (1 / 2))  # base of grid
 
-    #base grid
-    grid = [['.' for j in range(size)] for i in range(size)]
+    # base grid
+    grid = [["." for j in range(size)] for i in range(size)]
     solve(grid)
 
     # amount of cells that should be removed
-    amount = size*size - N
+    amount = size * size - N
     while amount > 0:
         row, col = [random.randrange(9) for i in range(2)]
-        
-        if (grid[row][col] != '.'):
-            grid[row][col] = '.'
+
+        if grid[row][col] != ".":
+            grid[row][col] = "."
             amount -= 1
 
     return grid
@@ -234,7 +237,7 @@ if __name__ == "__main__":
         solution = solve(grid)
         if not solution:
             print(f"Puzzle {fname} can't be solved")
-        else: 
+        else:
             display(solution)
             if check_solution(solution):
                 print("OK\n")
