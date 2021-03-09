@@ -218,7 +218,7 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
 
     # base grid
     grid = [["." for j in range(size)] for i in range(size)]
-    grid = solve(grid)
+    grid = solve(grid) # type: ignore
 
     # amount of cells that should be removed
     amount = size * size - N
