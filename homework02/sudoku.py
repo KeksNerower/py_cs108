@@ -154,8 +154,8 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     for i in find_possible_values(grid, pos):
         grid[row][col] = i
 
-        if solve(grid):
-            return grid
+        if solution := solve(grid):
+            return solution
 
     grid[row][col] = "."
     return None
@@ -171,6 +171,8 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     >>> check_solution([['1','2','3'], ['4','5','6'], ['7','8','1']])
     False
     """
+    target = set("123456789")
+
     for i in range(len(solution)):
         point = (i, i)
         b_point = ((i // 3) * 3, (i % 3) * 3)
@@ -181,7 +183,7 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
             & set(get_block(solution, b_point))
         )
 
-        if set("123456789") != full:
+        if target != full:
             return False
 
     return True
@@ -216,7 +218,7 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
 
     # base grid
     grid = [["." for j in range(size)] for i in range(size)]
-    solve(grid)
+    grid = solve(grid)
 
     # amount of cells that should be removed
     amount = size * size - N
