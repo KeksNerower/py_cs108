@@ -38,7 +38,7 @@ class Console(UI):
             self.draw_grid(screen)
             screen.refresh()
             
-            curses.napms(500)
+            curses.napms(200)
 
         
         screen.addstr(f"\nIterations: {self.life.generations}\n")
@@ -49,5 +49,5 @@ class Console(UI):
         curses.endwin()
 
 if __name__ == '__main__':
-    console = Console(GameOfLife((50, 50), max_generations=50))
+    console = Console(GameOfLife((50, 50), max_generations=200))
     console.run()
