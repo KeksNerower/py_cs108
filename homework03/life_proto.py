@@ -51,10 +51,11 @@ class GameOfLife:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
-            self.draw_lines()
+
 
             # Отрисовка списка клеток
             self.draw_grid()
+            self.draw_lines()
 
             # Выполнение одного шага игры (обновление состояния ячеек)
             self.field = self.get_next_generation()
