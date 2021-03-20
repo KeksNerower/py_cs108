@@ -49,5 +49,9 @@ class Console(UI):
         curses.endwin()
 
 if __name__ == '__main__':
-    console = Console(GameOfLife((50, 50), max_generations=200))
-    console.run()
+    # BE CAREFUL THE FIELD SHOULD NOT BE BIGGER THAN YOUR WINDOW CAN BE MEETED
+    console = Console(GameOfLife((20, 20), max_generations=200))
+    try: 
+        console.run()
+    except curses.error:
+        print("Check the size of the field !")
