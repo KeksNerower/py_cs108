@@ -17,14 +17,18 @@ class GUI(UI):
         self.width = self.cols * self.cell_size
 
         # Создание нового окна
-        self.screen = pygame.display.set_mode((self.width,self.height))
+        self.screen = pygame.display.set_mode((self.width, self.height))
 
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (x, 0), (x, self.height)
+            )
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (0, y), (self.width, y)
+            )
 
     def draw_grid(self) -> None:
         """
@@ -33,16 +37,17 @@ class GUI(UI):
         for i in range(self.rows):
             for j in range(self.cols):
 
-                if (self.life.curr_generation[i][j] == 1):
-                    color = pygame.Color('green')
+                if self.life.curr_generation[i][j] == 1:
+                    color = pygame.Color("green")
                 else:
-                    color = pygame.Color('white')
-                
+                    color = pygame.Color("white")
+
                 rect = pygame.Rect(
-                        j * self.cell_size,
-                        i * self.cell_size,
-                        self.cell_size,
-                        self.cell_size)
+                    j * self.cell_size,
+                    i * self.cell_size,
+                    self.cell_size,
+                    self.cell_size,
+                )
 
                 pygame.draw.rect(self.screen, color, rect)
 
@@ -68,7 +73,9 @@ class GUI(UI):
                     j, i = pygame.mouse.get_pos()
                     i = i // self.cell_size
                     j = j // self.cell_size
-                    self.life.curr_generation[i][j] = int(not bool(self.life.curr_generation[i][j]))
+                    self.life.curr_generation[i][j] = int(
+                        not bool(self.life.curr_generation[i][j])
+                    )
 
             if not is_paused:
                 # Выполнение одного шага игры
@@ -81,6 +88,7 @@ class GUI(UI):
             pygame.display.flip()
             clock.tick(self.speed)
         pygame.quit()
+
 
 if __name__ == "__main__":
     gui = GUI(GameOfLife((20, 30), False), cell_size=15)

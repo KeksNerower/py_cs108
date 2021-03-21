@@ -13,23 +13,22 @@ class Console(UI):
         rows = self.life.rows
         cols = self.life.cols
 
-        screen.addstr(str('+' + '-'*cols + '+' + '\n'))
+        screen.addstr(str("+" + "-" * cols + "+" + "\n"))
         for i in range(rows):
-            screen.addstr(str('|' + ' '*cols + '|' + '\n'))
-        screen.addstr(str('+' + '-'*cols + '+' + '\n'))
+            screen.addstr(str("|" + " " * cols + "|" + "\n"))
+        screen.addstr(str("+" + "-" * cols + "+" + "\n"))
 
     def draw_grid(self, screen) -> None:
         """ Отобразить состояние клеток. """
         for i in range(self.life.rows):
             for j in range(self.life.cols):
                 if self.life.curr_generation[i][j] == 1:
-                    screen.addch(i+1, j+1, "@")
-
+                    screen.addch(i + 1, j + 1, "@")
 
     def run(self) -> None:
         screen = curses.initscr()
         curses.curs_set(0)
-        
+
         while self.life.is_changing and not self.life.is_max_generations_exceeded:
             screen.clear()
 
@@ -37,10 +36,9 @@ class Console(UI):
             self.life.step()
             self.draw_grid(screen)
             screen.refresh()
-            
+
             curses.napms(200)
 
-        
         screen.addstr(f"\nIterations: {self.life.generations}\n")
         screen.refresh()
         curses.napms(3000)
@@ -48,10 +46,11 @@ class Console(UI):
         curses.curs_set(1)
         curses.endwin()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # BE CAREFUL THE FIELD SHOULD NOT BE BIGGER THAN YOUR WINDOW CAN BE MEETED
     console = Console(GameOfLife((20, 20), max_generations=200))
-    try: 
+    try:
         console.run()
     except curses.error:
         print("Check the size of the field !")
