@@ -152,7 +152,7 @@ class GameOfLife:
         out : Grid
             Новое поколение клеток.
         """
-        new_field = self.field
+        new_field = [[*line] for line in self.curr_generation]
 
         for i in range(self.cell_height):
             for j in range(self.cell_width):
