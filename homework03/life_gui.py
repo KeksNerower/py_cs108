@@ -60,7 +60,7 @@ class GUI(UI):
         while running:
             # Обработка внешних событий
             for event in pygame.event.get():
-                if event.type == QUIT:
+                if event.type == QUIT: #type: ignore
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:

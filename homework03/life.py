@@ -122,7 +122,7 @@ class GameOfLife:
         """
         Не превысило ли текущее число поколений максимально допустимое.
         """
-        return self.generations > self.max_generations
+        return self.generations > self.max_generations  # type: ignore
 
     @property
     def is_changing(self) -> bool:
@@ -151,7 +151,7 @@ class GameOfLife:
         """
         with open(filename, "w") as fw:
             for i in range(self.rows):
-                fw.write(" ".join([self.curr_generation[i][j] for j in range(self.cols)]) + "\n")
+                fw.write(" ".join([self.curr_generation[i][j] for j in range(self.cols)]) + "\n")  # type: ignore
 
 
 if __name__ == "__main__":
