@@ -71,15 +71,17 @@ class GameOfLife:
         out : Cells
             Список соседних клеток.
         """
-        x, y = cell
+        y, x = cell
         neighbours = []
 
         for i in range(y - 1, y + 2):
             if i < 0 or i >= self.rows:
+                # print("\tskip i")
                 continue
 
             for j in range(x - 1, x + 2):
                 if j < 0 or j >= self.cols:
+                    # print("\tskip j")
                     continue
 
                 neighbours.append(self.curr_generation[i][j])
@@ -100,7 +102,7 @@ class GameOfLife:
 
         for i in range(self.rows):
             for j in range(self.cols):
-                neighbours_amount = self.get_neighbours((j, i)).count(1)
+                neighbours_amount = self.get_neighbours((i, j)).count(1)
 
                 if neighbours_amount == 3:
                     new_field[i][j] = 1
@@ -122,7 +124,7 @@ class GameOfLife:
         """
         Не превысило ли текущее число поколений максимально допустимое.
         """
-        return self.generations > self.max_generations  # type: ignore
+        return self.generations >= self.max_generations  # type: ignore
 
     @property
     def is_changing(self) -> bool:
@@ -154,12 +156,16 @@ class GameOfLife:
                 fw.write(" ".join([self.curr_generation[i][j] for j in range(self.cols)]) + "\n")  # type: ignore
 
 
-if __name__ == "__main__":
-    game = GameOfLife((10, 10), max_generations=50)
-    for i in range(5):
-        print(f"Step: {game.generations}\n")
-        pp(game.prev_generation)
-        print("-" * 30)
-        pp(game.curr_generation)
-        print("=" * 30)
-        game.step()
+# if __name__ == "__main__":
+#     game = GameOfLife((5, 5), max_generations=50)
+#     # for i in range(5):
+#     #     print(f"Step: {game.generations}\n")
+#     #     pp(game.prev_generation)
+#     #     print("-" * 30)
+#     #     pp(game.curr_generation)
+#     #     print("=" * 30)
+#     #     game.step()
+#     pp(game.curr_generation)
+#     for i in range(game.rows):
+#         for j in range(game.cols):
+#             print(f"({i}, {j}): {game.get_neighbours((i, j))}\n")

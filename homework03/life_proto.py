@@ -29,6 +29,9 @@ class GameOfLife:
         # Скорость протекания игры
         self.speed = speed
 
+        # Создание списка клеток
+        self.grid = self.create_grid(True)
+
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
         for x in range(0, self.width, self.cell_size):
@@ -43,8 +46,8 @@ class GameOfLife:
         pygame.display.set_caption("Game of Life")
         self.screen.fill(pygame.Color("white"))
 
-        # Создание списка клеток
-        self.field = self.create_grid(True)
+        # # Создание списка клеток
+        # self.grid = self.create_grid(True)
 
         running = True
         while running:
@@ -57,7 +60,7 @@ class GameOfLife:
             self.draw_lines()
 
             # Выполнение одного шага игры (обновление состояния ячеек)
-            self.field = self.get_next_generation()
+            self.grid = self.get_next_generation()
 
             pygame.display.flip()
             clock.tick(self.speed)
@@ -97,7 +100,7 @@ class GameOfLife:
         for i in range(self.cell_height):
             for j in range(self.cell_width):
 
-                if self.field[i][j] == 1:
+                if self.grid[i][j] == 1:
                     color = pygame.Color("green")
                 else:
                     color = pygame.Color("white")
@@ -129,7 +132,7 @@ class GameOfLife:
         out : Cells
             Список соседних клеток.
         """
-        x, y = cell
+        y, x = cell
         neighbours = []
 
         for i in range(y - 1, y + 2):
@@ -140,8 +143,8 @@ class GameOfLife:
                 if j < 0 or j >= self.cell_width:
                     continue
 
-                neighbours.append(self.field[i][j])
-        neighbours.remove(self.field[y][x])
+                neighbours.append(self.grid[i][j])
+        neighbours.remove(self.grid[y][x])
 
         return neighbours
 
@@ -154,11 +157,11 @@ class GameOfLife:
         out : Grid
             Новое поколение клеток.
         """
-        new_field = [[*line] for line in self.field]
+        new_field = [[*line] for line in self.grid]
 
         for i in range(self.cell_height):
             for j in range(self.cell_width):
-                neighbours_amount = self.get_neighbours((j, i)).count(1)
+                neighbours_amount = self.get_neighbours((i, j)).count(1)
 
                 if neighbours_amount == 3:
                     new_field[i][j] = 1
