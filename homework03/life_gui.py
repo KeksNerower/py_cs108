@@ -22,13 +22,9 @@ class GUI(UI):
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(
-                self.screen, pygame.Color("black"), (x, 0), (x, self.height)
-            )
+            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(
-                self.screen, pygame.Color("black"), (0, y), (self.width, y)
-            )
+            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
 
     def draw_grid(self) -> None:
         """
@@ -73,9 +69,7 @@ class GUI(UI):
                     j, i = pygame.mouse.get_pos()
                     i = i // self.cell_size
                     j = j // self.cell_size
-                    self.life.curr_generation[i][j] = int(
-                        not bool(self.life.curr_generation[i][j])
-                    )
+                    self.life.curr_generation[i][j] = int(not bool(self.life.curr_generation[i][j]))
 
             if not is_paused:
                 # Выполнение одного шага игры

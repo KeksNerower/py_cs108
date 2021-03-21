@@ -51,10 +51,7 @@ class GameOfLife:
         if randomize:
             vars.add(1)
 
-        return [
-            [random.choice(list(vars)) for j in range(self.cols)]
-            for i in range(self.rows)
-        ]
+        return [[random.choice(list(vars)) for j in range(self.cols)] for i in range(self.rows)]
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
@@ -116,9 +113,7 @@ class GameOfLife:
         """
         Выполнить один шаг игры.
         """
-        self.prev_generation = [
-            self.curr_generation[i].copy() for i in range(self.rows)
-        ]
+        self.prev_generation = [self.curr_generation[i].copy() for i in range(self.rows)]
         self.curr_generation = self.get_next_generation()
         self.generations += 1
 
@@ -144,7 +139,7 @@ class GameOfLife:
         with open(filename, "r") as fr:
             lines = fr.readlines()
             field = [list(map(int, line)) for line in lines]
-        
+
         game = GameOfLife((len(field), len(field[0])), False)
         game.curr_generation = [[*line] for line in field]
 
@@ -156,10 +151,7 @@ class GameOfLife:
         """
         with open(filename, "w") as fw:
             for i in range(self.rows):
-                fw.write(
-                    " ".join([self.curr_generation[i][j] for j in range(self.cols)])
-                    + "\n"
-                )
+                fw.write(" ".join([self.curr_generation[i][j] for j in range(self.cols)]) + "\n")
 
 
 if __name__ == "__main__":
