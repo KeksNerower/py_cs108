@@ -49,7 +49,7 @@ class GameOfLife:
         running = True
         while running:
             for event in pygame.event.get():
-                if event.type == QUIT: #type: ignore
+                if event.type == QUIT:  # type: ignore
                     running = False
 
             # Отрисовка списка клеток
