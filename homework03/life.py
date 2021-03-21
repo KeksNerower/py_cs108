@@ -97,7 +97,7 @@ class GameOfLife:
         out : Grid
             Новое поколение клеток.
         """
-        new_field = self.curr_generation
+        new_field = [[*line] for line in self.curr_generation]
 
         for i in range(self.rows):
             for j in range(self.cols):
