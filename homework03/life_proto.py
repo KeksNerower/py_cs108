@@ -46,9 +46,6 @@ class GameOfLife:
         pygame.display.set_caption("Game of Life")
         self.screen.fill(pygame.Color("white"))
 
-        # # Создание списка клеток
-        # self.grid = self.create_grid(True)
-
         running = True
         while running:
             for event in pygame.event.get():
@@ -84,12 +81,11 @@ class GameOfLife:
         out : Grid
             Матрица клеток размером `cell_height` х `cell_width`.
         """
-        vars = set([0])
-        if randomize:
-            vars.add(1)
+        vars = [0,1] if randomize else [0]
+
 
         return [
-            [random.choice(list(vars)) for j in range(self.cell_width)]
+            [random.choice(vars) for j in range(self.cell_width)]
             for i in range(self.cell_height)
         ]
 

@@ -2,6 +2,7 @@ import pathlib
 import random
 import typing as tp
 from pprint import pprint as pp
+from copy import deepcopy
 
 import pygame
 from pygame.locals import *
@@ -47,11 +48,9 @@ class GameOfLife:
         out : Grid
             Матрица клеток размером `rows` х `cols`.
         """
-        vars = set([0])
-        if randomize:
-            vars.add(1)
+        vars = [0,1] if randomize else [0]
 
-        return [[random.choice(list(vars)) for j in range(self.cols)] for i in range(self.rows)]
+        return [[random.choice(vars) for j in range(self.cols)] for i in range(self.rows)]
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
@@ -76,12 +75,10 @@ class GameOfLife:
 
         for i in range(y - 1, y + 2):
             if i < 0 or i >= self.rows:
-                # print("\tskip i")
                 continue
 
             for j in range(x - 1, x + 2):
                 if j < 0 or j >= self.cols:
-                    # print("\tskip j")
                     continue
 
                 neighbours.append(self.curr_generation[i][j])
@@ -115,7 +112,7 @@ class GameOfLife:
         """
         Выполнить один шаг игры.
         """
-        self.prev_generation = [self.curr_generation[i].copy() for i in range(self.rows)]
+        self.prev_generation = deepcopy(self.curr_generation)
         self.curr_generation = self.get_next_generation()
         self.generations += 1
 
@@ -154,18 +151,3 @@ class GameOfLife:
         with open(filename, "w") as fw:
             for i in range(self.rows):
                 fw.write(" ".join([self.curr_generation[i][j] for j in range(self.cols)]) + "\n")  # type: ignore
-
-
-# if __name__ == "__main__":
-#     game = GameOfLife((5, 5), max_generations=50)
-#     # for i in range(5):
-#     #     print(f"Step: {game.generations}\n")
-#     #     pp(game.prev_generation)
-#     #     print("-" * 30)
-#     #     pp(game.curr_generation)
-#     #     print("=" * 30)
-#     #     game.step()
-#     pp(game.curr_generation)
-#     for i in range(game.rows):
-#         for j in range(game.cols):
-#             print(f"({i}, {j}): {game.get_neighbours((i, j))}\n")
