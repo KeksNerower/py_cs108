@@ -29,6 +29,9 @@ class GameOfLife:
         # Скорость протекания игры
         self.speed = speed
 
+        # Создание списка клеток
+        self.grid = self.create_grid(True)
+
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
         for x in range(0, self.width, self.cell_size):
@@ -43,19 +46,18 @@ class GameOfLife:
         pygame.display.set_caption("Game of Life")
         self.screen.fill(pygame.Color("white"))
 
-        # Создание списка клеток
-        # PUT YOUR CODE HERE
-
         running = True
         while running:
             for event in pygame.event.get():
-                if event.type == QUIT:
+                if event.type == QUIT:  # type: ignore
                     running = False
-            self.draw_lines()
 
             # Отрисовка списка клеток
+            self.draw_grid()
+            self.draw_lines()
+
             # Выполнение одного шага игры (обновление состояния ячеек)
-            # PUT YOUR CODE HERE
+            self.grid = self.get_next_generation()
 
             pygame.display.flip()
             clock.tick(self.speed)
@@ -79,13 +81,32 @@ class GameOfLife:
         out : Grid
             Матрица клеток размером `cell_height` х `cell_width`.
         """
-        pass
+        vars = [0, 1] if randomize else [0]
+
+        return [
+            [random.choice(vars) for j in range(self.cell_width)] for i in range(self.cell_height)
+        ]
 
     def draw_grid(self) -> None:
         """
         Отрисовка списка клеток с закрашиванием их в соответствующе цвета.
         """
-        pass
+        for i in range(self.cell_height):
+            for j in range(self.cell_width):
+
+                if self.grid[i][j] == 1:
+                    color = pygame.Color("green")
+                else:
+                    color = pygame.Color("white")
+
+                rect = pygame.Rect(
+                    j * self.cell_size,
+                    i * self.cell_size,
+                    self.cell_size,
+                    self.cell_size,
+                )
+
+                pygame.draw.rect(self.screen, color, rect)
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
@@ -105,7 +126,21 @@ class GameOfLife:
         out : Cells
             Список соседних клеток.
         """
-        pass
+        y, x = cell
+        neighbours = []
+
+        for i in range(y - 1, y + 2):
+            if i < 0 or i >= self.cell_height:
+                continue
+
+            for j in range(x - 1, x + 2):
+                if j < 0 or j >= self.cell_width:
+                    continue
+
+                neighbours.append(self.grid[i][j])
+        neighbours.remove(self.grid[y][x])
+
+        return neighbours
 
     def get_next_generation(self) -> Grid:
         """
@@ -116,4 +151,20 @@ class GameOfLife:
         out : Grid
             Новое поколение клеток.
         """
-        pass
+        new_field = [[*line] for line in self.grid]
+
+        for i in range(self.cell_height):
+            for j in range(self.cell_width):
+                neighbours_amount = self.get_neighbours((i, j)).count(1)
+
+                if neighbours_amount == 3:
+                    new_field[i][j] = 1
+                elif neighbours_amount != 2:
+                    new_field[i][j] = 0
+
+        return new_field
+
+
+if __name__ == "__main__":
+    game = GameOfLife()
+    game.run()
