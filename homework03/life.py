@@ -1,8 +1,8 @@
 import pathlib
 import random
 import typing as tp
-from pprint import pprint as pp
 from copy import deepcopy
+from pprint import pprint as pp
 
 import pygame
 from pygame.locals import *
@@ -48,7 +48,7 @@ class GameOfLife:
         out : Grid
             Матрица клеток размером `rows` х `cols`.
         """
-        vars = [0,1] if randomize else [0]
+        vars = [0, 1] if randomize else [0]
 
         return [[random.choice(vars) for j in range(self.cols)] for i in range(self.rows)]
 
