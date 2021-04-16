@@ -1,5 +1,6 @@
 import requests
-from asyncio.tasks import sleep
+import typing as tp
+from time import sleep
 
 class Session(requests.Session):
     """
@@ -26,25 +27,25 @@ class Session(requests.Session):
     def get(self, url, **kwargs: tp.Any) -> requests.Response:
         delay = self.timeout
 
-        while True:
+        for i in range(self.max_retries):
             try:
                 response = requests.get(self.base_url + url)
-                break
+                return response
             except requests.exceptions.RequestException:
                 sleep(delay)
-                delay = min(self.backoff_factor * delay, self.max_retries)
+                delay = self.backoff_factor * delay
 
-        return response
+        return None        
 
     def post(self, url, data=None, json=None, **kwargs: tp.Any) -> requests.Response:
         delay = self.timeout
 
-        while True:
+        for i in range(self.max_retries):
             try:
                 response = requests.post(self.base_url + url, data = data, json = json)
-                break
+                return response
             except requests.exceptions.RequestException:
                 sleep(delay)
-                delay = min(self.backoff_factor * delay, self.max_retries)
+                delay = self.backoff_factor * delay
 
-        return response
+        return None
