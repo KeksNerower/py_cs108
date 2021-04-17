@@ -25,26 +25,39 @@ class Session(requests.Session):
         self.backoff_factor = backoff_factor
 
     def get(self, url, **kwargs: tp.Any) -> requests.Response:
+        # Start delay
         delay = self.timeout
 
+        # Retries max_retries times
         for i in range(self.max_retries):
+            # Try to get response
             try:
+                # Get request
                 response = requests.get(self.base_url + url)
+                break
+            # Exponential backoff delay
             except requests.exceptions.RequestException:
                 sleep(delay)
-                print(delay)
                 delay = self.backoff_factor * delay
 
+        # Return response
         return response        
 
     def post(self, url, data=None, json=None, **kwargs: tp.Any) -> requests.Response:
+        # Start delay
         delay = self.timeout
 
+        # Retries max_retries times
         for i in range(self.max_retries):
+            # Try to get response
             try:
+                # Post request
                 response = requests.post(self.base_url + url, data = data, json = json)
+                break
+            # Exponential backoff delay
             except requests.exceptions.RequestException:
                 sleep(delay)
                 delay = self.backoff_factor * delay
 
+        # Return response
         return response
