@@ -19,7 +19,7 @@ class Session(requests.Session):
         max_retries: int = 3,
         backoff_factor: float = 0.3,
     ) -> None:
-        self.base_url = base_url
+        self.base_url = base_url + '/'
         self.timeout = timeout
         self.max_retries = max_retries
         self.backoff_factor = backoff_factor
@@ -33,6 +33,7 @@ class Session(requests.Session):
                 return response
             except requests.exceptions.RequestException:
                 sleep(delay)
+                print(delay)
                 delay = self.backoff_factor * delay
 
         return None        
