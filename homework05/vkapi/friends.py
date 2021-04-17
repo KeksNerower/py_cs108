@@ -1,9 +1,14 @@
 import typing as tp
 import dataclasses
+
 from datetime import datetime
 from statistics import median
+from math import ceil
+from time import sleep
+
 from vkapi.config import VK_CONFIG
 from vkapi.session import Session
+
 
 @dataclasses.dataclass(frozen=True)
 class FriendsResponse:
@@ -30,23 +35,34 @@ def get_friends(
     :param fields: Список полей, которые нужно получить для каждого пользователя.
     :return: Объект класса FriendsResponse.
     """
+    # Some data for query
     domain = VK_CONFIG["domain"]
     access_token = VK_CONFIG["access_token"]
     v = VK_CONFIG["version"]
 
-    query = f"friends.get?access_token={access_token}&user_id={user_id}&fields={'' if (fields == None) else ''.join(fields)}&v={v}"
+    # Query to get user friends
+    query = f"friends.get?\
+        access_token={access_token}&\
+        user_id={user_id}&\
+        fields={'' if (fields == None) else ','.join(fields)}&\
+        count={count}&\
+        offset={offset}&\
+        v={v}".replace(" ", "")
 
+    # New session
     session = Session(base_url=domain)
+
+    # Get response
     response = session.get(query)
 
+    # Check response status
     if (response.status_code != 200):
         return FriendsResponse(count=0, items=[])
 
-    amount = response.json()['response']['count']
+    # Get friends data from response
     items = response.json()['response']['items']
 
-    items = [items[i] for i in range(0, max(amount, count * offset), 1+offset)]
-
+    # Return friends data
     return FriendsResponse(count=len(items), items=items)
 
 
@@ -59,13 +75,104 @@ def age_predict(user_id: int) -> tp.Optional[float]:
     :param user_id: Идентификатор пользователя.
     :return: Медианный возраст пользователя.
     """
+    # List of friends' ages
     ages = []
+
+    # Get friends data with birthday field
     friends = get_friends(user_id=user_id, fields=['bdate'])
+
+    # For each friend in list
     for friend in friends.items:
+        # Try to get birthday date from friend data
         try:
             date = datetime.strptime(friend['bdate'], '%d.%m.%Y')
             ages.append(date.year)
         except:
             pass
     
+    # Return median age
     return median(ages)
+
+##############################################################################
+##############################################################################
+
+class MutualFriends(tp.TypedDict):
+    id: int
+    common_friends: tp.List[int]
+    common_count: int
+
+
+def get_mutual(
+    source_uid: tp.Optional[int] = None,
+    target_uid: tp.Optional[int] = None,
+    target_uids: tp.Optional[tp.List[int]] = None,
+    order: str = "",
+    count: tp.Optional[int] = None,
+    offset: int = 0,
+    progress=None,
+) -> tp.Union[tp.List[int], tp.List[MutualFriends]]:
+    """
+    Получить список идентификаторов общих друзей между парой пользователей.
+
+    :param source_uid: Идентификатор пользователя, чьи друзья пересекаются с друзьями пользователя с идентификатором target_uid.
+    :param target_uid: Идентификатор пользователя, с которым необходимо искать общих друзей.
+    :param target_uids: Cписок идентификаторов пользователей, с которыми необходимо искать общих друзей.
+    :param order: Порядок, в котором нужно вернуть список общих друзей.
+    :param count: Количество общих друзей, которое нужно вернуть.
+    :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
+    :param progress: Callback для отображения прогресса.
+    """
+    # Some data for query
+    domain = VK_CONFIG["domain"]
+    access_token = VK_CONFIG["access_token"]
+    v = VK_CONFIG["version"]
+    
+    # New session
+    session = Session(base_url=domain)
+
+    # If target_uid not None will work just with it
+    if (target_uid != None):
+        targets = [target_uid]
+    else:
+        targets = target_uids
+
+    # Found items list
+    items = []
+
+    # Process each handred of freands
+    for i in range(ceil(target_uids / 100)):
+        query = f"friends.getMutual?\
+            access_token={access_token}&\
+            source_uid={source_uid}&\
+            target_uids={'' if (targets == None or targets == []) else ','.join(targets[i*100:(i+1)*100])}&\
+            order={order}&\
+            count={count}&\
+            offset={offset}&\
+            v={v}".replace(" ", "")
+
+        # Wait 1 second between each 3 requests
+        if (i % 3 == 0):
+            sleep(1)
+
+        # Get response
+        response = session.get(query)
+
+        # Check response status
+        if (response.status_code != 200):
+            continue
+        
+        # If response contains friends of only one target 
+        if len(response.json()['request']) == 1:
+            # Return list of ids
+            return response.json()['request']
+        
+        # For each target in response 
+        for target in response.json()['response']:
+            # Append target data to items list
+            items.append(MutualFriends(
+                    id=target['id'], 
+                    common_friends=target['common_friends'], 
+                    common_count=target['common_count']))
+
+    # Return items list
+    return items
