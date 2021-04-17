@@ -30,13 +30,12 @@ class Session(requests.Session):
         for i in range(self.max_retries):
             try:
                 response = requests.get(self.base_url + url)
-                return response
             except requests.exceptions.RequestException:
                 sleep(delay)
                 print(delay)
                 delay = self.backoff_factor * delay
 
-        return None        
+        return response        
 
     def post(self, url, data=None, json=None, **kwargs: tp.Any) -> requests.Response:
         delay = self.timeout
@@ -44,9 +43,8 @@ class Session(requests.Session):
         for i in range(self.max_retries):
             try:
                 response = requests.post(self.base_url + url, data = data, json = json)
-                return response
             except requests.exceptions.RequestException:
                 sleep(delay)
                 delay = self.backoff_factor * delay
 
-        return None
+        return response
