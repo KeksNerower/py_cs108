@@ -139,8 +139,8 @@ def get_mutual(
     # Found items list
     items = []
 
-    # Process each handred of freands
-    for i in range(ceil(target_uids / 100)):
+    # Process each handred of friends
+    for i in range(ceil(len(targets) / 100)):
         query = f"friends.getMutual?\
             access_token={access_token}&\
             source_uid={source_uid}&\
