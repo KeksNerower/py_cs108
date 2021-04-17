@@ -102,6 +102,7 @@ class MutualFriends(tp.TypedDict):
     common_count: int
 
 
+# This function faild if target has private profile
 def get_mutual(
     source_uid: tp.Optional[int] = None,
     target_uid: tp.Optional[int] = None,
@@ -109,7 +110,7 @@ def get_mutual(
     order: str = "",
     count: tp.Optional[int] = None,
     offset: int = 0,
-    progress=None,
+    progress=lambda x : x,
 ) -> tp.Union[tp.List[int], tp.List[MutualFriends]]:
     """
     Получить список идентификаторов общих друзей между парой пользователей.
@@ -139,14 +140,14 @@ def get_mutual(
     # Found items list
     items = []
 
-    # Process each handred of friends
-    for i in range(ceil(len(targets) / 100)):
+    # Process each handred of friends with process handler
+    for i in progress(range(ceil(len(targets) / 100))):
         query = f"friends.getMutual?\
             access_token={access_token}&\
-            source_uid={source_uid}&\
-            target_uids={'' if (targets == None or targets == []) else ','.join(targets[i*100:(i+1)*100])}&\
+            source_uid={'' if (source_uid == None) else source_uid}&\
+            target_uids={'' if (targets == None or targets == []) else ','.join(map(str, targets[i*100:(i+1)*100]))}&\
             order={order}&\
-            count={count}&\
+            count={'' if (count == None) else count}&\
             offset={offset}&\
             v={v}".replace(" ", "")
 
@@ -160,12 +161,7 @@ def get_mutual(
         # Check response status
         if (response.status_code != 200):
             continue
-        
-        # If response contains friends of only one target 
-        if len(response.json()['request']) == 1:
-            # Return list of ids
-            return response.json()['request']
-        
+                
         # For each target in response 
         for target in response.json()['response']:
             # Append target data to items list
@@ -173,6 +169,10 @@ def get_mutual(
                     id=target['id'], 
                     common_friends=target['common_friends'], 
                     common_count=target['common_count']))
+
+    # If items contains friends of only one target
+    if len(items) == 1:
+        return items[0]['common_friends']
 
     # Return items list
     return items
