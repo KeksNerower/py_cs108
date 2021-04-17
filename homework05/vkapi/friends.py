@@ -1,5 +1,7 @@
 import typing as tp
 import dataclasses
+from datetime import datetime
+from statistics import median
 from vkapi.config import VK_CONFIG
 from vkapi.session import Session
 
@@ -38,7 +40,7 @@ def get_friends(
     response = session.get(query)
 
     if (response.status_code != 200):
-        return None
+        return FriendsResponse(count=0, items=[])
 
     amount = response.json()['response']['count']
     items = response.json()['response']['items']
@@ -46,3 +48,24 @@ def get_friends(
     items = [items[i] for i in range(0, max(amount, count * offset), 1+offset)]
 
     return FriendsResponse(count=len(items), items=items)
+
+
+def age_predict(user_id: int) -> tp.Optional[float]:
+    """
+    Наивный прогноз возраста пользователя по возрасту его друзей.
+
+    Возраст считается как медиана среди возраста всех друзей пользователя.
+
+    :param user_id: Идентификатор пользователя.
+    :return: Медианный возраст пользователя.
+    """
+    ages = []
+    friends = get_friends(user_id=user_id, fields=['bdate'])
+    for friend in friends.items:
+        try:
+            date = datetime.strptime(friend['bdate'], '%d.%m.%Y')
+            ages.append(date.year)
+        except:
+            pass
+    
+    return median(ages)
