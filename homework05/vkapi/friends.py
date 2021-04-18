@@ -44,7 +44,7 @@ def get_friends(
     query = f"friends.get?\
         access_token={access_token}&\
         user_id={user_id}&\
-        fields={'' if (fields == None) else ','.join(fields)}&\
+        fields={'' if (fields == None or fields == []) else ','.join(fields)}&\
         count={count}&\
         offset={offset}&\
         v={v}".replace(" ", "")
@@ -171,8 +171,37 @@ def get_mutual(
                     common_count=target['common_count']))
 
     # If items contains friends of only one target
-    if len(items) == 1:
+    if target_uid != None:
         return items[0]['common_friends']
 
     # Return items list
     return items
+
+
+def ego_network(
+    user_id: tp.Optional[int] = None, friends: tp.Optional[tp.List[int]] = None
+) -> tp.List[tp.Tuple[int, int]]:
+    """
+    Построить эгоцентричный граф друзей.
+
+    :param user_id: Идентификатор пользователя, для которого строится граф друзей.
+    :param friends: Идентификаторы друзей, между которыми устанавливаются связи.
+    """
+    # Get all user's friends as default 
+    if (friends == None):
+        friends = get_friends(user_id=user_id, fields=['nickname']).items
+
+    # Get just active friends to processing
+    active_friends = [user["id"] for user in friends if not user.get("deactivated") and not user.get("is_closed")]
+        
+    # Get list of MutualFriends 
+    items = get_mutual(source_uid=user_id, target_uids=active_friends)
+
+    # Net list 
+    net = []
+
+    for item in items:
+        net.extend([(item['id'], mutual) for mutual in item['common_friends']])
+
+    return net
+    
