@@ -200,8 +200,10 @@ def ego_network(
     # Net list 
     net = []
 
+    # Fill net-list with tuples (friend_id, mutual_id)
     for item in items:
         net.extend([(item['id'], mutual) for mutual in item['common_friends']])
 
+    # Return net list
     return net
     
