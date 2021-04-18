@@ -1,6 +1,9 @@
 from vkapi.config import VK_CONFIG
 import requests
 import vkapi.friends as fr
+import matplotlib.pyplot as plt
+
+import networkx as nx
 
 # domain = VK_CONFIG["domain"]
 # access_token = VK_CONFIG["access_token"]
@@ -26,10 +29,26 @@ import vkapi.friends as fr
 # response = requests.get(query)
 # print(response.json())
 
-friends_response = fr.get_friends(user_id=817934, fields=["nickname"])
-active_users = [user["id"] for user in friends_response.items if not user.get("deactivated") and not user.get("is_closed")]
-print(len(active_users))
 
-mutual_friends = fr.get_mutual(source_uid=817934, target_uids=active_users)
 
-print(mutual_friends)
+# friends_response = fr.get_friends(user_id=817934, fields=["nickname"])
+# active_users = [user["id"] for user in friends_response.items if not user.get("deactivated") and not user.get("is_closed")]
+# print(len(active_users))
+
+# mutual_friends = fr.get_mutual(source_uid=817934, target_uids=active_users)
+
+# print(mutual_friends)
+
+options = {
+    'node_color': 'black',
+    'edge_color': 'grey',
+    'node_size': 25,
+    'width': 1,
+}
+
+net = fr.ego_network(user_id=817934)
+g = nx.Graph()
+g.add_edges_from(net)
+print(g)
+nx.draw(g, **options)
+plt.savefig("mygraph.png")
