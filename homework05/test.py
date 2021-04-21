@@ -1,24 +1,31 @@
 import vkapi.friends as fr
+from vkapi.config import VK_CONFIG
 
-import community as community_louvain
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
-import networkx as nx
+import requests
 
 
-# Creating graph
-net = fr.ego_network(user_id=459560428)
-g = nx.Graph()
-g.add_edges_from(net)
+# Some data for query
+domain = VK_CONFIG["domain"]
+access_token = VK_CONFIG["access_token"]
+v = VK_CONFIG["version"]
 
-# Finding partitios
-partition = community_louvain.best_partition(g)
+# Code
+code = """return API.wall.get({
+    "owner_id": "",
+    "domain": "itmoru",
+    "offset": 0,
+    "count": 1,
+    "filter": "owner",
+    "extended": 0,
+    "fields": "",
+    "v": "5.126"
+});"""
 
-pos = nx.spring_layout(g)
-cmap = cm.get_cmap('viridis', max(partition.values()) + 1)
-nx.draw_networkx_nodes(g, pos, partition.keys(), node_size=20,
-                       cmap=cmap, node_color=list(partition.values()))
-nx.draw_networkx_edges(g, pos, alpha=0.5)
-
-# Save graph to picture
-plt.savefig("mygraph.png")
+response = requests.post(
+    url=f"{domain}/execute",
+        data={
+            "code": code,
+            "access_token": access_token,  # PUT YOUR ACCESS TOKEN HERE
+            "v": v,
+        }
+)

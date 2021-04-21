@@ -33,15 +33,15 @@ class Session(requests.Session):
             # Try to get response
             try:
                 # Get request
-                response = requests.get(self.base_url + url)
-                break
+                return requests.get(self.base_url + url)
+
             # Exponential backoff delay
             except requests.exceptions.RequestException:
                 sleep(delay)
                 delay = self.backoff_factor * delay
 
-        # Return response
-        return response        
+        # # Return response
+        # return response        
 
     def post(self, url, data=None, json=None, **kwargs: tp.Any) -> requests.Response:
         # Start delay
@@ -52,12 +52,12 @@ class Session(requests.Session):
             # Try to get response
             try:
                 # Post request
-                response = requests.post(self.base_url + url, data = data, json = json)
-                break
+                return requests.post(self.base_url + url, data = data, json = json)
+
             # Exponential backoff delay
             except requests.exceptions.RequestException:
                 sleep(delay)
                 delay = self.backoff_factor * delay
 
-        # Return response
-        return response
+        # # Return response
+        # return response
