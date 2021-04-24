@@ -56,21 +56,21 @@ class FriendsTestCase(unittest.TestCase):
     def test_get_mutual_more_than100(self):
         responses.add(
             responses.GET,
-            re.compile("https://api.vk.com/method/friends.getMutual\?.*offset=0.*"),
+            re.compile("https://api.vk.com/method/friends.getMutual\?.*"),
             match_querystring=True,
             json={"response": [{"id": 1, "common_friends": [2, 3], "common_count": 2}]},
             status=200,
         )
         responses.add(
             responses.GET,
-            re.compile("https://api.vk.com/method/friends.getMutual\?.*offset=100.*"),
+            re.compile("https://api.vk.com/method/friends.getMutual\?.*"),
             match_querystring=True,
             json={"response": [{"id": 2, "common_friends": [1, 3], "common_count": 2}]},
             status=200,
         )
         responses.add(
             responses.GET,
-            re.compile("https://api.vk.com/method/friends.getMutual\?.*offset=200.*"),
+            re.compile("https://api.vk.com/method/friends.getMutual\?.*"),
             match_querystring=True,
             json={"response": [{"id": 3, "common_friends": [1, 2], "common_count": 2}]},
             status=200,
