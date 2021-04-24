@@ -1,23 +1,17 @@
-import typing as tp
 import dataclasses
-
-from datetime import datetime
-from statistics import median
 from math import ceil
 from time import sleep
+import typing as tp
 
 from vkapi.config import VK_CONFIG
 from vkapi.session import Session
+from vkapi.exceptions import APIError
+
+QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
 
 
 @dataclasses.dataclass(frozen=True)
 class FriendsResponse:
-    """
-    Ответ на вызов метода `friends.get`.
-
-    :param count: Количество пользователей.
-    :param items: Список идентификаторов друзей пользователя или список пользователей.
-    """
     count: int
     items: tp.Union[tp.List[int], tp.List[tp.Dict[str, tp.Any]]]
 
@@ -33,68 +27,40 @@ def get_friends(
     :param count: Количество друзей, которое нужно вернуть.
     :param offset: Смещение, необходимое для выборки определенного подмножества друзей.
     :param fields: Список полей, которые нужно получить для каждого пользователя.
-    :return: Объект класса FriendsResponse.
+    :return: Список идентификаторов друзей пользователя или список пользователей.
     """
     # Some data for query
     domain = VK_CONFIG["domain"]
     access_token = VK_CONFIG["access_token"]
     v = VK_CONFIG["version"]
 
-    # Query to get user friends
-    query = f"friends.get?\
-        access_token={access_token}&\
-        user_id={user_id}&\
-        fields={'' if (fields == None or fields == []) else ','.join(fields)}&\
-        count={count}&\
-        offset={offset}&\
-        v={v}".replace(" ", "")
-
     # New session
     session = Session(base_url=domain)
 
     # Get response
-    response = session.get(query)
+    response = session.get(
+        "friends.get",
+        params={
+            "access_token": access_token,
+            "user_id": user_id,
+            "count": count,
+            "offset": offset,
+            "fields": fields,
+            "v": v,
+        },
+    ).json()
 
-    # Check response status
-    if (response.status_code != 200):
-        return FriendsResponse(count=0, items=[])
+    # Check the response contains correct data
+    if "response" not in response:
+        # Throw exception
+        raise APIError(response)
 
     # Get friends data from response
-    items = response.json()['response']['items']
+    items = response['response']['items']
 
     # Return friends data
     return FriendsResponse(count=len(items), items=items)
 
-
-def age_predict(user_id: int) -> tp.Optional[float]:
-    """
-    Наивный прогноз возраста пользователя по возрасту его друзей.
-
-    Возраст считается как медиана среди возраста всех друзей пользователя.
-
-    :param user_id: Идентификатор пользователя.
-    :return: Медианный возраст пользователя.
-    """
-    # List of friends' ages
-    ages = []
-
-    # Get friends data with birthday field
-    friends = get_friends(user_id=user_id, fields=['bdate'])
-
-    # For each friend in list
-    for friend in friends.items:
-        # Try to get birthday date from friend data
-        try:
-            date = datetime.strptime(friend['bdate'], '%d.%m.%Y')
-            ages.append(date.year)
-        except:
-            pass
-    
-    # Return median age
-    return median(ages)
-
-##############################################################################
-##############################################################################
 
 class MutualFriends(tp.TypedDict):
     id: int
@@ -102,7 +68,7 @@ class MutualFriends(tp.TypedDict):
     common_count: int
 
 
-# This function faild if target has private profile
+# This function fails if target has private profile
 def get_mutual(
     source_uid: tp.Optional[int] = None,
     target_uid: tp.Optional[int] = None,
@@ -110,7 +76,7 @@ def get_mutual(
     order: str = "",
     count: tp.Optional[int] = None,
     offset: int = 0,
-    progress=lambda x : x,
+    progress=None,
 ) -> tp.Union[tp.List[int], tp.List[MutualFriends]]:
     """
     Получить список идентификаторов общих друзей между парой пользователей.
@@ -140,30 +106,40 @@ def get_mutual(
     # Found items list
     items = []
 
-    # Process each handred of friends with process handler
-    for i in progress(range(ceil(len(targets) / 100))):
-        query = f"friends.getMutual?\
-            access_token={access_token}&\
-            source_uid={'' if (source_uid == None) else source_uid}&\
-            target_uids={'' if (targets == None or targets == []) else ','.join(map(str, targets[i*100:(i+1)*100]))}&\
-            order={order}&\
-            count={'' if (count == None) else count}&\
-            offset={offset}&\
-            v={v}".replace(" ", "")
+    # Counter for loopping
+    counter = range(0, len(targets), 100)
 
+    # Wrap with progress handler
+    if progress != None:
+        counter = progress(counter)
+
+    # Process each handred of friends
+    for i in counter:
         # Wait 1 second between each 3 requests
         if (i % 3 == 0):
             sleep(1)
 
         # Get response
-        response = session.get(query)
+        response = session.get(
+            "friends.getMutual",
+            params={
+                "access_token": access_token,
+                "source_uid": source_uid,
+                "target_uids": ','.join(map(str, targets[i:i+100])),
+                "order": order,
+                "count": count,
+                "offset": offset,
+                "v": v,
+            },
+        ).json()
 
-        # Check response status
-        if (response.status_code != 200):
-            continue
+        # Check the response contains correct data
+        if "response" not in response:
+            # Throw exception
+            raise APIError(response)
                 
         # For each target in response 
-        for target in response.json()['response']:
+        for target in response['response']:
             # Append target data to items list
             items.append(MutualFriends(
                     id=target['id'], 
@@ -176,34 +152,3 @@ def get_mutual(
 
     # Return items list
     return items
-
-
-def ego_network(
-    user_id: tp.Optional[int] = None, friends: tp.Optional[tp.List[int]] = None
-) -> tp.List[tp.Tuple[int, int]]:
-    """
-    Построить эгоцентричный граф друзей.
-
-    :param user_id: Идентификатор пользователя, для которого строится граф друзей.
-    :param friends: Идентификаторы друзей, между которыми устанавливаются связи.
-    """
-    # Get all user's friends as default 
-    if (friends == None):
-        friends = get_friends(user_id=user_id, fields=['nickname']).items
-
-    # Get just active friends to processing
-    active_friends = [user["id"] for user in friends if not user.get("deactivated") and not user.get("is_closed")]
-        
-    # Get list of MutualFriends 
-    items = get_mutual(source_uid=user_id, target_uids=active_friends)
-
-    # Net list 
-    net = []
-
-    # Fill net-list with tuples (friend_id, mutual_id)
-    for item in items:
-        net.extend([(item['id'], mutual) for mutual in item['common_friends']])
-
-    # Return net list
-    return net
-    
