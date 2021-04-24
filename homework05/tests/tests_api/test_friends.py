@@ -1,12 +1,10 @@
-import json
-import random
 import re
 import time
 import unittest
 
 import responses
 
-from vkapi.friends import get_friends, get_mutual
+from vkapi.friends import FriendsResponse, get_friends, get_mutual
 
 
 class FriendsTestCase(unittest.TestCase):
@@ -20,7 +18,8 @@ class FriendsTestCase(unittest.TestCase):
             status=200,
         )
         fids = get_friends(user_id=1)
-        self.assertEqual(expected_fids, fids)
+        expected_response = FriendsResponse(count=len(expected_fids), items=expected_fids)
+        self.assertEqual(expected_response, fids)
 
     @responses.activate
     def test_get_mutual(self):
@@ -100,5 +99,5 @@ class FriendsTestCase(unittest.TestCase):
         start = time.time()
         mutual_friends = get_mutual(target_uids=list(range(n_reqs * 100)))
         end = time.time()
-        self.assertGreaterEqual(end - start, 1.0, msg="Too many requests per second")
+        self.assertGreaterEqual(end - start, 1.0, msg="Слишком много запросов в секунду")
         self.assertEqual(common_friends * n_reqs, mutual_friends)
