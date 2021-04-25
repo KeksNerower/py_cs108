@@ -1,12 +1,96 @@
-import pandas as pd
-import requests
 import textwrap
-
-from pandas.io.json import json_normalize
+from time import sleep
+import typing as tp
 from string import Template
-from tqdm import tqdm
+from math import ceil
+
+import pandas as pd
+from pandas import json_normalize
 
 from vkapi.config import VK_CONFIG
+from vkapi.session import Session
+from vkapi.exceptions import APIError
+
+
+def get_posts_2500(
+    owner_id: str = "",
+    domain: str = "",
+    offset: int = 0,
+    count: int = 10,
+    max_count: int = 2500,
+    filter: str = "owner",
+    extended: int = 0,
+    fields: tp.Optional[tp.List[str]] = None,
+) -> tp.Dict[str, tp.Any]:
+    """
+    Возвращает 2500 записей состены пользователи или сообщества.
+    """
+    # Some data for query
+    base_domain = VK_CONFIG["domain"]
+    access_token = VK_CONFIG["access_token"]
+    v = VK_CONFIG["version"]
+
+    # New session
+    session = Session(base_url=base_domain)
+
+    # Max count couldn't be more than 2500
+    if max_count > 2500:
+        max_count = 2500
+
+    # If should get count less than max_count
+    if max_count > count:
+        max_count = count
+
+    # VKScript code
+    code = f"""
+    var shift = {offset};
+    var posts = [];
+    var count = {ceil(max_count / 25)}; 
+
+    while(shift - {offset} < {max_count}) {{
+        posts.push(API.wall.get({{
+            "owner_id": "{owner_id}",
+            "domain": "{domain}",
+            "offset": shift,
+            "count": count,
+            "filter": "{filter}",
+            "extended": {extended},
+            "fields": "{fields}",
+            "v": {v},
+        }}));
+
+        shift = shift + count;
+    }}
+
+    return posts;
+    """
+
+    print(code)
+
+    # Post request with execute method
+    response = session.post(
+        "execute",
+        data={
+            "code": code,
+            "access_token": access_token,
+            "v": v,
+        }
+    )
+    data = response.json()
+
+    # Check the response contains correct data
+    if "response" not in data:
+        # Throw exception
+        raise APIError(data)
+
+    # Result posts list
+    result_posts = []
+
+    # Return response data
+    for posts in data['response']:
+        result_posts.extend([posts['items'][i] for i in range(len(posts['items']))])
+
+    return result_posts
 
 
 def get_wall_execute(
@@ -14,54 +98,102 @@ def get_wall_execute(
     domain: str = "",
     offset: int = 0,
     count: int = 10,
+    max_count: int = 2500,
     filter: str = "owner",
-    extended: str = "",
-    fields: str = "",
-    v: str = "5.126",
+    extended: int = 0,
+    fields: tp.Optional[tp.List[str]] = None,
     progress=None,
 ) -> pd.DataFrame:
     """
     Возвращает список записей со стены пользователя или сообщества.
 
-    @see: https://vk.com/dev/wall.get 
+    @see: https://vk.com/dev/wall.get
 
     :param owner_id: Идентификатор пользователя или сообщества, со стены которого необходимо получить записи.
     :param domain: Короткий адрес пользователя или сообщества.
-    :param offset: Смещение, необходимое для выборки определенного подмножества записей.
-    :param count: Количество записей, которое необходимо получить (0 - все записи).
+    :param offset: Максимальное число записей, которое может быть получено за один запрос.
+    :param count: Смещение, необходимое для выборки определенного подмножества записей.
+    :param max_count: Количество записей, которое необходимо получить (0 - все записи).
     :param filter: Определяет, какие типы записей на стене необходимо получить.
     :param extended: 1 — в ответе будут возвращены дополнительные поля profiles и groups, содержащие информацию о пользователях и сообществах.
     :param fields: Список дополнительных полей для профилей и сообществ, которые необходимо вернуть.
-    :param v: Версия API.
     :param progress: Callback для отображения прогресса.
     """
-    
     # Some data for query
     base_domain = VK_CONFIG["domain"]
     access_token = VK_CONFIG["access_token"]
     v = VK_CONFIG["version"]
 
-    # Params
-    params = f'''
-    "owner_id": {owner_id},
-    "domain": {domain},
-    "offset": {offset},
-    "count": {count},
-    "filter": {filter},
-    "extended": {extended},
-    "fields": {fields},
-    "v": {v},
-    '''
+    # Request query
+    code = f"""
+    return API.wall.get({{
+        "owner_id": "{owner_id}",
+        "domain": "{domain}",
+        "offset": {offset},
+        "count": 1,
+        "filter": "{filter}",
+        "extended": {extended},
+        "v": {v}
+    }});
+    """
 
-    # Code field for request
-    code = "return API.wall.get({" + params + "});"
+    # New session
+    session = Session(base_url=base_domain)
 
     # Post request with execute method
-    response = requests.post(
-    url=f"{base_domain}/execute",
+    response = session.post(
+        url="execute",
         data={
             "code": code,
             "access_token": access_token,
             "v": v,
-        }
-    )
+        },
+    ).json()
+
+    # Check the response contains correct data
+    if "response" not in response:
+        # Throw exception
+        raise APIError(response)
+
+    post_count = response['response']['count']
+
+    # If max_count is 0 method should return all posts
+    if max_count == 0 or max_count > post_count:
+        max_count = post_count
+
+    # Counter for loopping
+    counter = range(ceil(max_count / 2500))
+
+    # Wrap with progress handler
+    if progress != None:
+        counter = progress(counter)
+
+    posts =[]
+    next_count = 2500
+
+    # Process each 2500 posts
+    for i in counter:
+        # Wait 1 second between each 3 requests
+        if (i % 3 == 0):
+            sleep(1)
+
+        if max_count - len(posts) < 2500:
+            next_count = max_count % 2500
+
+        try:
+            next_posts = get_posts_2500(
+                owner_id=owner_id,
+                domain=domain,
+                offset=offset + len(posts),
+                count=count,
+                max_count=next_count,
+                filter=filter,
+                extended=extended,
+                fields=fields,
+            )
+            posts.update(next_posts)
+
+        except Exception as e:
+            APIError(str(e))
+
+    return json_normalize(posts)
