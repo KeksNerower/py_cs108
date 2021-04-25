@@ -65,8 +65,6 @@ def get_posts_2500(
     return posts;
     """
 
-    print(code)
-
     # Post request with execute method
     response = session.post(
         "execute",
@@ -88,7 +86,7 @@ def get_posts_2500(
 
     # Return response data
     for posts in data['response']:
-        result_posts.extend([posts['items'][i] for i in range(len(posts['items']))])
+        result_posts.extend(posts['items'])
 
     return result_posts
 
@@ -111,9 +109,9 @@ def get_wall_execute(
 
     :param owner_id: Идентификатор пользователя или сообщества, со стены которого необходимо получить записи.
     :param domain: Короткий адрес пользователя или сообщества.
-    :param offset: Максимальное число записей, которое может быть получено за один запрос.
-    :param count: Смещение, необходимое для выборки определенного подмножества записей.
-    :param max_count: Количество записей, которое необходимо получить (0 - все записи).
+    :param offset: Смещение, необходимое для выборки определенного подмножества записей.
+    :param count: Количество записей, которое необходимо получить (0 - все записи).
+    :param max_count: Максимальное число записей, которое может быть получено за один запрос.
     :param filter: Определяет, какие типы записей на стене необходимо получить.
     :param extended: 1 — в ответе будут возвращены дополнительные поля profiles и groups, содержащие информацию о пользователях и сообществах.
     :param fields: Список дополнительных полей для профилей и сообществ, которые необходимо вернуть.
@@ -124,7 +122,7 @@ def get_wall_execute(
     access_token = VK_CONFIG["access_token"]
     v = VK_CONFIG["version"]
 
-    # Request query
+    # First request query
     code = f"""
     return API.wall.get({{
         "owner_id": "{owner_id}",
@@ -155,45 +153,48 @@ def get_wall_execute(
         # Throw exception
         raise APIError(response)
 
-    post_count = response['response']['count']
+    all_posts_count = response['response']['count']
 
-    # If max_count is 0 method should return all posts
-    if max_count == 0 or max_count > post_count:
-        max_count = post_count
+    # If count is 0 method should return all posts
+    if count == 0 or count > all_posts_count:
+        count = all_posts_count
 
     # Counter for loopping
-    counter = range(ceil(max_count / 2500))
+    counter = range(ceil(count / max_count))
 
     # Wrap with progress handler
     if progress != None:
         counter = progress(counter)
 
+    # Result posts list
     posts =[]
-    next_count = 2500
-
-    # Process each 2500 posts
+    # Next count to get_posts_2500 func
+    next_count = count
+    
     for i in counter:
         # Wait 1 second between each 3 requests
         if (i % 3 == 0):
             sleep(1)
 
-        if max_count - len(posts) < 2500:
-            next_count = max_count % 2500
-
+        # Try to get data
         try:
             next_posts = get_posts_2500(
                 owner_id=owner_id,
                 domain=domain,
                 offset=offset + len(posts),
-                count=count,
-                max_count=next_count,
+                count=next_count,
+                max_count=max_count,
                 filter=filter,
-                extended=extended,
+                extended=extended,  
                 fields=fields,
             )
-            posts.update(next_posts)
+            # Add to result list
+            posts.extend(next_posts)
+            # Sub posts that were getted
+            next_count -= max_count
 
         except Exception as e:
             APIError(str(e))
-
+    
+    # JSON data into a flat table
     return json_normalize(posts)
