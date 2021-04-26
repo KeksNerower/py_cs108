@@ -4,7 +4,7 @@ import typing as tp
 from string import Template
 from math import ceil
 
-import pandas as pd
+import pandas as pd #type: ignore
 from pandas import json_normalize
 
 from vkapi.config import VK_CONFIG
@@ -88,7 +88,7 @@ def get_posts_2500(
     for posts in data['response']:
         result_posts.extend(posts['items'])
 
-    return result_posts
+    return result_posts #type: ignore
 
 
 def get_wall_execute(
@@ -167,7 +167,8 @@ def get_wall_execute(
         counter = progress(counter)
 
     # Result posts list
-    posts =[]
+    posts =[] #type: ignore
+    
     # Next count to get_posts_2500 func
     next_count = count
     

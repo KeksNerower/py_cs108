@@ -33,13 +33,13 @@ class Session(requests.Session):
         self.mount(base_url, HTTPAdapter(max_retries=self.retries))
 
 
-    def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:
+    def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response: #type: ignore
         if 'timeout' not in kwargs:
             kwargs['timeout'] = self.timeout
         return super().get(f"{self.base_url}/{url}", *args, **kwargs)
 
 
-    def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:
+    def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response: #type: ignore
         if 'timeout' not in kwargs:
             kwargs['timeout'] = self.timeout
         return super().post(f"{self.base_url}/{url}", *args, **kwargs)

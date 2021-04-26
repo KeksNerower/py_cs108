@@ -101,7 +101,7 @@ def get_mutual(
     if (target_uid != None):
         targets = [target_uid]
     else:
-        targets = target_uids
+        targets = target_uids #type: ignore
 
     # Found items list
     items = []

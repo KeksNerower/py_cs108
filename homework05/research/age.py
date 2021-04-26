@@ -24,7 +24,7 @@ def age_predict(user_id: int) -> tp.Optional[float]:
     for friend in friends.items:
         # Try to get birthday date from friend data
         try:
-            date = dt.strptime(friend['bdate'], '%d.%m.%Y')
+            date = dt.strptime(friend['bdate'], '%d.%m.%Y') #type: ignore
             ages.append(date.year)
         except:
             pass

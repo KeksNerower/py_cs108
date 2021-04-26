@@ -1,10 +1,10 @@
 import typing as tp
 from collections import defaultdict
 
-import community as community_louvain
-import matplotlib.pyplot as plt
-import networkx as nx
-import pandas as pd
+import community as community_louvain #type: ignore
+import matplotlib.pyplot as plt #type: ignore
+import networkx as nx #type: ignore
+import pandas as pd #type: ignore
 
 from vkapi.friends import get_friends, get_mutual
 
@@ -20,12 +20,11 @@ def ego_network(
     """
     # Get all user's friends as default 
     if (friends == None):
-        friends = get_friends(user_id=user_id, fields=['nickname']).items
-
+        friends = get_friends(user_id=user_id, fields=['nickname']).items #type: ignore
         # Get just active friends to processing
-        active_friends = [user["id"] for user in friends if not user.get("deactivated") and not user.get("is_closed")]
+        active_friends = [user["id"] for user in friends if not user.get("deactivated") and not user.get("is_closed")] #type: ignore
     else:
-        active_friends = friends
+        active_friends = friends #type: ignore
 
     # Get list of MutualFriends 
     items = get_mutual(source_uid=user_id, target_uids=active_friends)
@@ -35,7 +34,7 @@ def ego_network(
 
     # Fill net-list with tuples (friend_id, mutual_id)
     for item in items:
-        net.extend([(item['id'], mutual) for mutual in item['common_friends']])
+        net.extend([(item['id'], mutual) for mutual in item['common_friends']]) #type: ignore
 
     # Return net list
     return net
