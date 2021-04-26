@@ -127,7 +127,7 @@ def get_wall_execute(
         "owner_id": "{owner_id}",
         "domain": "{domain}",
         "offset": {offset},
-        "count": 1,
+        "count": "1",
         "filter": "{filter}",
         "extended": {extended},
         "v": {v}
@@ -153,6 +153,10 @@ def get_wall_execute(
         raise APIError(response)
 
     all_posts_count = response["response"]["count"]
+
+    # Return post if just 1 needed
+    if all_posts_count == 1:
+        return json_normalize(response["response"]["items"])
 
     # If count is 0 method should return all posts
     if count == 0 or count > all_posts_count:
