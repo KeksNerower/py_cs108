@@ -1,15 +1,14 @@
 import textwrap
-from time import sleep
 import typing as tp
-from string import Template
 from math import ceil
+from string import Template
+from time import sleep
 
-import pandas as pd #type: ignore
+import pandas as pd  # type: ignore
 from pandas import json_normalize
-
 from vkapi.config import VK_CONFIG
-from vkapi.session import Session
 from vkapi.exceptions import APIError
+from vkapi.session import Session
 
 
 def get_posts_2500(

@@ -1,6 +1,6 @@
+import typing as tp
 from datetime import datetime as dt
 from statistics import median
-import typing as tp
 
 from vkapi.friends import get_friends
 

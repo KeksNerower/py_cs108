@@ -1,9 +1,8 @@
-import gensim #type: ignore
-import pyLDAvis.gensim_models #type: ignore
-from gensim.corpora import Dictionary #type: ignore
-from textacy import preprocessing #type: ignore
-from tqdm import tqdm #type: ignore
-
+import gensim  # type: ignore
+import pyLDAvis.gensim_models  # type: ignore
+from gensim.corpora import Dictionary  # type: ignore
+from textacy import preprocessing  # type: ignore
+from tqdm import tqdm  # type: ignore
 from vkapi.wall import get_wall_execute
 
 

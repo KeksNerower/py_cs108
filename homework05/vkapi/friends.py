@@ -1,11 +1,11 @@
 import dataclasses
+import typing as tp
 from math import ceil
 from time import sleep
-import typing as tp
 
 from vkapi.config import VK_CONFIG
-from vkapi.session import Session
 from vkapi.exceptions import APIError
+from vkapi.session import Session
 
 QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
 
