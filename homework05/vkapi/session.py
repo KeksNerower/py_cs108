@@ -26,20 +26,18 @@ class Session(requests.Session):
         self.base_url = base_url
         self.timeout = timeout
         self.retries = Retry(
-            total=max_retries, 
-            backoff_factor=backoff_factor, 
+            total=max_retries,
+            backoff_factor=backoff_factor,
             status_forcelist=[429, 500, 502, 503, 504],
         )
         self.mount(base_url, HTTPAdapter(max_retries=self.retries))
 
-
-    def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response: #type: ignore
-        if 'timeout' not in kwargs:
-            kwargs['timeout'] = self.timeout
+    def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = self.timeout
         return super().get(f"{self.base_url}/{url}", *args, **kwargs)
 
-
-    def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response: #type: ignore
-        if 'timeout' not in kwargs:
-            kwargs['timeout'] = self.timeout
+    def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = self.timeout
         return super().post(f"{self.base_url}/{url}", *args, **kwargs)

@@ -18,17 +18,17 @@ def age_predict(user_id: int) -> tp.Optional[float]:
     ages = []
 
     # Get friends data with birthday field
-    friends = get_friends(user_id=user_id, fields=['bdate'])
+    friends = get_friends(user_id=user_id, fields=["bdate"])
 
     # For each friend in list
     for friend in friends.items:
         # Try to get birthday date from friend data
         try:
-            date = dt.strptime(friend['bdate'], '%d.%m.%Y') #type: ignore
+            date = dt.strptime(friend["bdate"], "%d.%m.%Y")  # type: ignore
             ages.append(date.year)
         except:
             pass
-    
+
     if not ages:
         return None
 

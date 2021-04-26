@@ -71,7 +71,7 @@ def get_posts_2500(
             "code": code,
             "access_token": access_token,
             "v": v,
-        }
+        },
     )
     data = response.json()
 
@@ -84,10 +84,10 @@ def get_posts_2500(
     result_posts = []
 
     # Return response data
-    for posts in data['response']:
-        result_posts.extend(posts['items'])
+    for posts in data["response"]:
+        result_posts.extend(posts["items"])
 
-    return result_posts #type: ignore
+    return result_posts  # type: ignore
 
 
 def get_wall_execute(
@@ -152,7 +152,7 @@ def get_wall_execute(
         # Throw exception
         raise APIError(response)
 
-    all_posts_count = response['response']['count']
+    all_posts_count = response["response"]["count"]
 
     # If count is 0 method should return all posts
     if count == 0 or count > all_posts_count:
@@ -166,14 +166,14 @@ def get_wall_execute(
         counter = progress(counter)
 
     # Result posts list
-    posts =[] #type: ignore
-    
+    posts = []  # type: ignore
+
     # Next count to get_posts_2500 func
     next_count = count
-    
+
     for i in counter:
         # Wait 1 second between each 3 requests
-        if (i % 3 == 0):
+        if i % 3 == 0:
             sleep(1)
 
         # Try to get data
@@ -185,7 +185,7 @@ def get_wall_execute(
                 count=next_count,
                 max_count=max_count,
                 filter=filter,
-                extended=extended,  
+                extended=extended,
                 fields=fields,
             )
             # Add to result list
@@ -195,6 +195,6 @@ def get_wall_execute(
 
         except Exception as e:
             APIError(str(e))
-    
+
     # JSON data into a flat table
     return json_normalize(posts)
