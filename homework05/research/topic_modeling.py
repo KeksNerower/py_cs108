@@ -1,5 +1,5 @@
 import gensim
-import pyLDAvis.gensim
+import pyLDAvis.gensim_models
 from gensim.corpora import Dictionary
 from textacy import preprocessing
 from tqdm import tqdm
