@@ -1,12 +1,9 @@
-import json
-import random
 import re
 import time
 import unittest
 
-import responses
-
-from vkapi.friends import get_friends, get_mutual
+import responses  # type: ignore
+from vkapi.friends import FriendsResponse, get_friends, get_mutual
 
 
 class FriendsTestCase(unittest.TestCase):
@@ -20,7 +17,8 @@ class FriendsTestCase(unittest.TestCase):
             status=200,
         )
         fids = get_friends(user_id=1)
-        self.assertEqual(expected_fids, fids)
+        expected_response = FriendsResponse(count=len(expected_fids), items=expected_fids)
+        self.assertEqual(expected_response, fids)
 
     @responses.activate
     def test_get_mutual(self):
@@ -57,21 +55,21 @@ class FriendsTestCase(unittest.TestCase):
     def test_get_mutual_more_than100(self):
         responses.add(
             responses.GET,
-            re.compile("https://api.vk.com/method/friends.getMutual\?.*offset=0.*"),
+            re.compile("https://api.vk.com/method/friends.getMutual\?.*"),
             match_querystring=True,
             json={"response": [{"id": 1, "common_friends": [2, 3], "common_count": 2}]},
             status=200,
         )
         responses.add(
             responses.GET,
-            re.compile("https://api.vk.com/method/friends.getMutual\?.*offset=100.*"),
+            re.compile("https://api.vk.com/method/friends.getMutual\?.*"),
             match_querystring=True,
             json={"response": [{"id": 2, "common_friends": [1, 3], "common_count": 2}]},
             status=200,
         )
         responses.add(
             responses.GET,
-            re.compile("https://api.vk.com/method/friends.getMutual\?.*offset=200.*"),
+            re.compile("https://api.vk.com/method/friends.getMutual\?.*"),
             match_querystring=True,
             json={"response": [{"id": 3, "common_friends": [1, 2], "common_count": 2}]},
             status=200,
@@ -100,5 +98,5 @@ class FriendsTestCase(unittest.TestCase):
         start = time.time()
         mutual_friends = get_mutual(target_uids=list(range(n_reqs * 100)))
         end = time.time()
-        self.assertGreaterEqual(end - start, 1.0, msg="Too many requests per second")
+        self.assertGreaterEqual(end - start, 1.0, msg="Слишком много запросов в секунду")
         self.assertEqual(common_friends * n_reqs, mutual_friends)
