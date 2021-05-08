@@ -150,7 +150,7 @@ def get_wall_execute(
             "v": v,
         },
     )
-    
+
     # Check response code status
     if response.status_code == 200:
         data = response.json()
