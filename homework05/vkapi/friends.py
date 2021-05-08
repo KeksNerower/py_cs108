@@ -58,7 +58,6 @@ def get_friends(
 
     # Check the response contains correct data
     if "response" not in data:
-        # Throw exception
         raise APIError(data)
 
     # Get friends data from response
@@ -147,7 +146,6 @@ def get_mutual(
 
         # Check the response contains correct data
         if "response" not in data:
-            # Throw exception
             raise APIError(data)
 
         # For each target in response

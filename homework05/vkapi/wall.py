@@ -82,7 +82,6 @@ def get_posts_2500(
 
     # Check the response contains correct data
     if "response" not in data:
-        # Throw exception
         raise APIError(data)
 
     # Result posts list
@@ -160,7 +159,6 @@ def get_wall_execute(
 
     # Check the response contains correct data
     if "response" not in data:
-        # Throw exception
         raise APIError(data)
 
     all_posts_count = data["response"]["count"]
