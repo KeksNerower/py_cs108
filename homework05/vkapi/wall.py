@@ -73,7 +73,12 @@ def get_posts_2500(
             "v": v,
         },
     )
-    data = response.json()
+
+    # Check response code status
+    if response.status_code == 200:
+        data = response.json()
+    else:
+        raise APIError(f"Response status code: {response.status_code}")
 
     # Check the response contains correct data
     if "response" not in data:
@@ -145,18 +150,24 @@ def get_wall_execute(
             "access_token": access_token,
             "v": v,
         },
-    ).json()
+    )
+    
+    # Check response code status
+    if response.status_code == 200:
+        data = response.json()
+    else:
+        raise APIError(f"Response status code: {response.status_code}")
 
     # Check the response contains correct data
-    if "response" not in response:
+    if "response" not in data:
         # Throw exception
-        raise APIError(response)
+        raise APIError(data)
 
-    all_posts_count = response["response"]["count"]
+    all_posts_count = data["response"]["count"]
 
     # Return post if just 1 needed
     if all_posts_count == 1:
-        return json_normalize(response["response"]["items"])
+        return json_normalize(data["response"]["items"])
 
     # If count is 0 method should return all posts
     if count == 0 or count > all_posts_count:

@@ -48,15 +48,21 @@ def get_friends(
             "fields": fields,
             "v": v,
         },
-    ).json()
+    )
+
+    # Check response code status
+    if response.status_code == 200:
+        data = response.json()
+    else:
+        raise APIError(f"Response status code: {response.status_code}")
 
     # Check the response contains correct data
-    if "response" not in response:
+    if "response" not in data:
         # Throw exception
-        raise APIError(response)
+        raise APIError(data)
 
     # Get friends data from response
-    items = response["response"]["items"]
+    items = data["response"]["items"]
 
     # Return friends data
     return FriendsResponse(count=len(items), items=items)
@@ -131,15 +137,21 @@ def get_mutual(
                 "offset": offset,
                 "v": v,
             },
-        ).json()
+        )
+
+        # Check response code status
+        if response.status_code == 200:
+            data = response.json()
+        else:
+            raise APIError(f"Response status code: {response.status_code}")
 
         # Check the response contains correct data
-        if "response" not in response:
+        if "response" not in data:
             # Throw exception
-            raise APIError(response)
+            raise APIError(data)
 
         # For each target in response
-        for target in response["response"]:
+        for target in data["response"]:
             # Append target data to items list
             items.append(
                 MutualFriends(
